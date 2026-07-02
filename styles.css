@@ -51,6 +51,15 @@
     font-size: 1.8rem;
 }
 
+/* Logo Image Style */
+.logo-img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin: 0 auto 15px;
+    display: block;
+}
+
 .login-header h1 {
     font-size: 1.5rem;
     font-weight: 700;
@@ -320,6 +329,13 @@ aside {
     font-weight: bold;
     font-size: 1.25rem;
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.sidebar-logo {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    border-radius: var(--radius-md);
 }
 
 .school-info h1 {
