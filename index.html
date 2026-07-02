@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="description" content="Sistem Presensi Guru Tidak Tetap dan Honor SMP THHK">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Presensi GTT">
+    <title>Sistem Presensi GTT - SMP THHK</title>
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <!-- CSS Link -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%236366f1' width='100' height='100' rx='20'/><text x='50' y='60' font-size='40' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>TH</text></svg>">
+    <!-- Lucide Icons for Premium Look -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js for beautiful analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="logo-container">
+                        <span>TH</span>
+                    </div>
+                    <h1>SMP THHK</h1>
+                    <p>Sistem Presensi GTT & Honor</p>
+                </div>
+                <form id="login-form" class="login-form">
+                    <div class="form-group">
+                        <label for="login-username">Username</label>
+                        <input type="text" id="login-username" required placeholder="Masukkan username">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required placeholder="Masukkan password">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">
+                        <i data-lucide="log-in"></i> Masuk
+                    </button>
+                </form>
+                <div class="login-footer">
+                    <p>Demo Login:</p>
+                    <p><strong>Admin:</strong> admin / admin123</p>
+                    <p><strong>Guru:</strong> guru001 / guru123</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP WRAPPER -->
+    <div id="app-wrapper">
+
+        <!-- SIDEBAR NAV -->
+        <aside>
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <span>TH</span>
+                </div>
+                <div class="school-info">
+                    <h1>SMP THHK</h1>
+                    <p>Presensi GTT & Honor</p>
+                </div>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="#dashboard" class="menu-item active" data-page="dashboard-page">
+                        <i data-lucide="layout-dashboard"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#guru" class="menu-item" data-page="guru-page">
+                        <i data-lucide="users"></i>
+                        <span>Data Guru GTT</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#jadwal" class="menu-item" data-page="jadwal-page">
+                        <i data-lucide="calendar"></i>
+                        <span>Jadwal Mengajar</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#presensi" class="menu-item" data-page="presensi-page">
+                        <i data-lucide="user-check"></i>
+                        <span>Presensi Harian</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#laporan" class="menu-item" data-page="laporan-page">
+                        <i data-lucide="file-spreadsheet"></i>
+                        <span>Laporan & Slip Honor</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="theme-switch">
+                    <span>Mode Gelap</span>
+                    <div class="switch-btn" id="theme-toggle"></div>
+                </div>
+                <div class="user-profile-card">
+                    <div class="avatar">AD</div>
+                    <div class="profile-info">
+                        <div class="profile-name">Administrator</div>
+                        <div class="profile-role">Tata Usaha</div>
+                    </div>
+                </div>
+                <button class="btn btn-logout" id="logout-btn">
+                    <i data-lucide="log-out"></i>
+                    <span>Keluar</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN WRAPPER -->
+        <div class="app-container">
+
+            <!-- HEADER BAR -->
+            <header>
+                <div class="header-left">
+                    <button class="menu-toggle" id="menu-toggle">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+                    <div class="header-title">
+                        <h2 id="page-title">Dashboard</h2>
+                        <p id="page-subtitle">Ringkasan aktivitas presensi dan jam mengajar guru.</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="datetime-display">
+                        <div class="time" id="live-time">00:00:00</div>
+                        <div class="date" id="live-date">Kamis, 02 Juli 2026</div>
+                    </div>
+                    <button class="btn btn-header" id="quick-presensi-btn">
+                        <i data-lucide="plus-circle"></i>
+                        <span>Presensi Cepat</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- ==================== DASHBOARD PAGE ==================== -->
+            <section id="dashboard-page" class="page-section active">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card stats-primary">
+                        <div class="stat-icon">
+                            <i data-lucide="users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="label">Total Guru GTT</span>
+                            <span class="value" id="stat-total-guru">0</span>
+                            <span class="subtext">Aktif mengajar</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stats-success">
+                        <div class="stat-icon">
+                            <i data-lucide="check-square"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="label">Kehadiran Hari Ini</span>
+                            <span class="value" id="stat-hadir-hari-ini">0</span>
+                            <span class="subtext" id="stat-persen-hadir">0% dari jadwal</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stats-warning">
+                        <div class="stat-icon">
+                            <i data-lucide="clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="label">Total Jam (JP)</span>
+                            <span class="value" id="stat-total-jp">0</span>
+                            <span class="subtext">Bulan berjalan</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stats-info">
+                        <div class="stat-icon">
+                            <i data-lucide="wallet"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="label">Estimasi Honor</span>
+                            <span class="value" id="stat-total-honor">Rp 0</span>
+                            <span class="subtext">Bulan berjalan</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Charts / Info columns -->
+                <div class="dashboard-grid">
+                    <!-- Left: Attendance Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i data-lucide="trending-up"></i>
+                                Tren Kehadiran (15 Hari Terakhir)
+                            </h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="attendanceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Right: Today's Schedule & Action -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i data-lucide="calendar-days"></i>
+                                Jadwal Hari Ini
+                            </h3>
+                        </div>
+                        <div class="schedule-quick-list" id="dashboard-schedule-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom: Recent Attendance Activity -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i data-lucide="history"></i>
+                            Aktivitas Presensi Terbaru
+                        </h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Waktu</th>
+                                    <th>Guru</th>
+                                    <th>Mata Pelajaran</th>
+                                    <th>Kelas</th>
+                                    <th>JP</th>
+                                    <th>Status</th>
+                                    <th>Materi / Catatan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-recent-presensi">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== GURU GTT PAGE ==================== -->
+            <section id="guru-page" class="page-section">
+                <div class="card">
+                    <div class="table-filter-bar">
+                        <div class="search-box">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="guru-search" placeholder="Cari nama guru atau mata pelajaran...">
+                        </div>
+                        <div class="filter-group">
+                            <button class="btn btn-primary" id="btn-tambah-guru">
+                                <i data-lucide="plus"></i> Tambah Guru GTT
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>NUPTK / ID</th>
+                                    <th>Nama Lengkap</th>
+                                    <th>Mata Pelajaran</th>
+                                    <th>Honor / JP</th>
+                                    <th>No. WhatsApp</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="guru-table-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== JADWAL PAGE ==================== -->
+            <section id="jadwal-page" class="page-section">
+                <div class="card">
+                    <div class="table-filter-bar">
+                        <div class="filter-group">
+                            <select class="select-input" id="jadwal-filter-hari">
+                                <option value="">Semua Hari</option>
+                                <option value="Senin">Senin</option>
+                                <option value="Selasa">Selasa</option>
+                                <option value="Rabu">Rabu</option>
+                                <option value="Kamis">Kamis</option>
+                                <option value="Jumat">Jumat</option>
+                                <option value="Sabtu">Sabtu</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" id="btn-tambah-jadwal">
+                            <i data-lucide="plus"></i> Tambah Jadwal Mengajar
+                        </button>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Hari</th>
+                                    <th>Waktu</th>
+                                    <th>Guru</th>
+                                    <th>Mata Pelajaran</th>
+                                    <th>Kelas</th>
+                                    <th>Jumlah JP</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jadwal-table-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== PRESENSI PAGE ==================== -->
+            <section id="presensi-page" class="page-section">
+                <div class="card">
+                    <div class="table-filter-bar">
+                        <div class="filter-group">
+                            <input type="date" class="text-input" id="presensi-filter-tanggal">
+                            <select class="select-input" id="presensi-filter-guru">
+                                <option value="">Semua Guru</option>
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" id="btn-presensi-manual">
+                            <i data-lucide="user-check"></i> Input Presensi Kelas
+                        </button>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Nama Guru</th>
+                                    <th>Kelas</th>
+                                    <th>Mata Pelajaran</th>
+                                    <th>JP Aktual</th>
+                                    <th>Status Kehadiran</th>
+                                    <th>Materi / Catatan</th>
+                                    <th>Tanda Tangan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="presensi-table-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== LAPORAN & PAYROLL PAGE ==================== -->
+            <section id="laporan-page" class="page-section">
+                <div class="report-period-selector">
+                    <div class="filter-group">
+                        <label for="laporan-bulan" style="font-weight: 500;">Periode Laporan:</label>
+                        <select class="select-input" id="laporan-bulan">
+                            <option value="0">Januari</option>
+                            <option value="1">Februari</option>
+                            <option value="2">Maret</option>
+                            <option value="3">April</option>
+                            <option value="4">Mei</option>
+                            <option value="5">Juni</option>
+                            <option value="6">Juli</option>
+                            <option value="7">Agustus</option>
+                            <option value="8">September</option>
+                            <option value="9">Oktober</option>
+                            <option value="10">November</option>
+                            <option value="11">Desember</option>
+                        </select>
+                        <select class="select-input" id="laporan-tahun">
+                            <option value="2025">2025</option>
+                            <option value="2026" selected>2026</option>
+                            <option value="2027">2027</option>
+                        </select>
+                    </div>
+                    <div style="margin-left: auto; display: flex; gap: 10px;">
+                        <button class="btn btn-success" id="btn-ekspor-csv">
+                            <i data-lucide="download"></i> Ekspor Laporan (.CSV)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="reports-list-grid" id="reports-grid">
+                    <!-- Card per Guru will be generated dynamically -->
+                </div>
+            </section>
+
+        </div>
+
+        <!-- ==================== MODALS SYSTEM ==================== -->
+
+        <!-- 1. GURU MODAL -->
+        <div class="modal-overlay" id="guru-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="guru-modal-title">Tambah Guru GTT</h3>
+                    <button class="modal-close" onclick="closeModal('guru-modal')">&times;</button>
+                </div>
+                <form id="guru-form">
+                    <div class="modal-body">
+                        <input type="hidden" id="guru-id">
+                        <div class="form-group">
+                            <label for="guru-nuptk">NUPTK / ID Guru</label>
+                            <input type="text" id="guru-nuptk" required placeholder="Contoh: 198402122009032001">
+                        </div>
+                        <div class="form-group">
+                            <label for="guru-nama">Nama Lengkap (beserta Gelar)</label>
+                            <input type="text" id="guru-nama" required placeholder="Contoh: Budi Santoso, S.Pd.">
+                        </div>
+                        <div class="form-group">
+                            <label for="guru-mapel">Mata Pelajaran Utama</label>
+                            <input type="text" id="guru-mapel" required
+                                placeholder="Contoh: Matematika, Bahasa Inggris">
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="guru-honor">Honor Per Jam Pelajaran (JP)</label>
+                                <input type="number" id="guru-honor" required placeholder="Contoh: 50000" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="guru-wa">Nomor WhatsApp</label>
+                                <input type="text" id="guru-wa" placeholder="Contoh: 08123456789">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="guru-status">Status Mengajar</label>
+                            <select id="guru-status">
+                                <option value="Aktif">Aktif</option>
+                                <option value="Nonaktif">Nonaktif</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            onclick="closeModal('guru-modal')">Batal</button>
+                        <button type="submit" class="btn btn-primary" id="btn-save-guru">Simpan Data</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 2. JADWAL MODAL -->
+        <div class="modal-overlay" id="jadwal-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Tambah Jadwal Mengajar</h3>
+                    <button class="modal-close" onclick="closeModal('jadwal-modal')">&times;</button>
+                </div>
+                <form id="jadwal-form">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="jadwal-guru-id">Pilih Guru GTT</label>
+                            <select id="jadwal-guru-id" required>
+                                <option value="">-- Pilih Guru --</option>
+                                <!-- Dynamically added -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="jadwal-hari">Hari</label>
+                            <select id="jadwal-hari" required>
+                                <option value="Senin">Senin</option>
+                                <option value="Selasa">Selasa</option>
+                                <option value="Rabu">Rabu</option>
+                                <option value="Kamis">Kamis</option>
+                                <option value="Jumat">Jumat</option>
+                                <option value="Sabtu">Sabtu</option>
+                            </select>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="jadwal-jam-mulai">Jam Mulai</label>
+                                <input type="time" id="jadwal-jam-mulai" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="jadwal-jam-selesai">Jam Selesai</label>
+                                <input type="time" id="jadwal-jam-selesai" required>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="jadwal-kelas">Kelas</label>
+                                <input type="text" id="jadwal-kelas" required placeholder="Contoh: VII-A, IX-C">
+                            </div>
+                            <div class="form-group">
+                                <label for="jadwal-jp">Jumlah JP (Jam Pelajaran)</label>
+                                <input type="number" id="jadwal-jp" required min="1" max="10" placeholder="Contoh: 2">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="jadwal-mapel">Mata Pelajaran Spesifik</label>
+                            <input type="text" id="jadwal-mapel"
+                                placeholder="Kosongkan untuk mengikuti mapel utama guru">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            onclick="closeModal('jadwal-modal')">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Jadwal</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 3. PRESENSI MODAL -->
+        <div class="modal-overlay" id="presensi-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Input Presensi Kehadiran</h3>
+                    <button class="modal-close" onclick="closeModal('presensi-modal')">&times;</button>
+                </div>
+                <form id="presensi-form">
+                    <div class="modal-body">
+                        <input type="hidden" id="presensi-jadwal-id">
+                        <div class="form-group">
+                            <label for="presensi-guru-id">Nama Guru GTT</label>
+                            <select id="presensi-guru-id" required>
+                                <option value="">-- Pilih Guru --</option>
+                                <!-- Dynamically added -->
+                            </select>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="presensi-tanggal">Tanggal Kehadiran</label>
+                                <input type="date" id="presensi-tanggal" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="presensi-status">Status Kehadiran</label>
+                                <select id="presensi-status" required>
+                                    <option value="Hadir">Hadir</option>
+                                    <option value="Izin">Izin</option>
+                                    <option value="Sakit">Sakit</option>
+                                    <option value="Alpa">Alpa</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="presensi-kelas">Kelas</label>
+                                <input type="text" id="presensi-kelas" required placeholder="Contoh: VIII-B">
+                            </div>
+                            <div class="form-group">
+                                <label for="presensi-jp">JP Aktual (Sesuai Mengajar)</label>
+                                <input type="number" id="presensi-jp" required min="0" max="10"
+                                    placeholder="Jumlah Jam Pelajaran">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="presensi-mapel">Mata Pelajaran diajarkan</label>
+                            <input type="text" id="presensi-mapel" required placeholder="Nama Mata Pelajaran">
+                        </div>
+                        <div class="form-group form-group-full">
+                            <label for="presensi-materi">Materi Pembelajaran / Catatan Kelas</label>
+                            <textarea id="presensi-materi" rows="3"
+                                placeholder="Tulis rincian materi yang diajarkan atau alasan ketidakhadiran..."></textarea>
+                        </div>
+
+                        <!-- Signature Canvas (Digital Sign-in) -->
+                        <div class="form-group form-group-full" id="signature-form-group">
+                            <label>Tanda Tangan Guru</label>
+                            <div class="signature-container">
+                                <canvas id="signature-canvas"></canvas>
+                            </div>
+                            <div class="signature-actions">
+                                <span class="signature-hint">Gunakan mouse atau layar sentuh untuk tanda tangan di
+                                    atas.</span>
+                                <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-sig">
+                                    <i data-lucide="eraser"></i> Bersihkan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            onclick="closeModal('presensi-modal')">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Presensi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 4. DETAIL LAPORAN MODAL -->
+        <div class="modal-overlay" id="rincian-modal">
+            <div class="modal-content" style="max-width: 750px;">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="rincian-modal-title">Rincian Presensi Guru</h3>
+                    <button class="modal-close" onclick="closeModal('rincian-modal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Kelas</th>
+                                    <th>Mapel</th>
+                                    <th>JP</th>
+                                    <th>Status</th>
+                                    <th>Materi / Catatan</th>
+                                    <th>Tanda Tangan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rincian-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('rincian-modal')">Tutup</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TOAST NOTIFICATIONS ==================== -->
+        <div class="toast-container" id="toast-container"></div>
+
+        <!-- ==================== SLIP GAJI PRINT TEMPLATE (HIDDEN FOR SCREEN, VISIBLE ON PRINT) ==================== -->
+        <div id="slip-print-template">
+            <div class="slip-container">
+                <div class="slip-header">
+                    <h2>YAYASAN PENDIDIKAN TIONG HOA HWE KOAN</h2>
+                    <h3 style="margin: 0; font-size: 1.1rem; font-weight: bold;">SMP THHK</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 0.85rem;">Jl. Kebon Jeruk No. 19, Jakarta Barat | Telp:
+                        (021) 555-1234</p>
+                </div>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h4 style="text-decoration: underline; font-weight: bold; margin: 0; font-size: 1rem;">SLIP HONOR
+                        GURU TIDAK TETAP (GTT)</h4>
+                    <p style="margin: 2px 0 0 0; font-size: 0.85rem;" id="print-slip-periode">Periode: Juli 2026</p>
+                </div>
+                <div class="slip-details">
+                    <div>Nama Guru</div>
+                    <div>:</div>
+                    <div id="print-slip-nama">Budi Santoso, S.Pd.</div>
+                    <div>NUPTK / ID</div>
+                    <div>:</div>
+                    <div id="print-slip-nuptk">198402122009032001</div>
+                    <div>Mata Pelajaran</div>
+                    <div>:</div>
+                    <div id="print-slip-mapel">Matematika</div>
+                    <div>Tarif Honor / JP</div>
+                    <div>:</div>
+                    <div id="print-slip-tarif">Rp 50.000</div>
+                </div>
+
+                <table class="slip-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: center; width: 60px;">No</th>
+                            <th>Keterangan Kehadiran</th>
+                            <th style="text-align: center; width: 120px;">Frekuensi / JP</th>
+                            <th style="text-align: right; width: 150px;">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="text-align: center;">1</td>
+                            <td>Kehadiran Mengajar Aktif (Hadir)</td>
+                            <td style="text-align: center;" id="print-slip-jp">42 JP</td>
+                            <td style="text-align: right;" id="print-slip-subtotal">Rp 2.100.000</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center;">2</td>
+                            <td>Izin / Sakit / Alpa</td>
+                            <td style="text-align: center;" id="print-slip-absen">2 JP</td>
+                            <td style="text-align: right;">Rp 0</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="slip-totals">
+                    <span>TOTAL DITERIMA: </span>
+                    <span id="print-slip-total">Rp 2.100.000</span>
+                </div>
+
+                <div class="slip-signatures">
+                    <div class="slip-sig-box">
+                        <p>Mengetahui,</p>
+                        <p style="font-weight: bold; margin-top: 5px;">Kepala SMP THHK</p>
+                        <div class="slip-sig-line">
+                            <span>( Drs. M. Yusuf )</span>
+                        </div>
+                    </div>
+                    <div class="slip-sig-box">
+                        <p>Jakarta, <span id="print-slip-tanggal-ttd">02 Juli 2026</span></p>
+                        <p style="font-weight: bold; margin-top: 5px;">Penerima,</p>
+                        <!-- Digital signature will render here -->
+                        <img id="print-slip-sig-img" class="slip-signature-img" src="" alt="Tanda Tangan Guru">
+                        <div class="slip-sig-line">
+                            <span id="print-slip-nama-ttd">Budi Santoso, S.Pd.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JS Logic -->
+        <script src="app.js"></script>
+</body>
+
+</html>
