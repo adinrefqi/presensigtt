@@ -1570,12 +1570,13 @@ document.addEventListener("DOMContentLoaded", () => {
     // Login form submit
     const loginForm = document.getElementById("login-form");
     if (loginForm) {
-        loginForm.addEventListener("submit", (e) => {
+        loginForm.addEventListener("submit", async (e) => {
             e.preventDefault();
             const username = document.getElementById("login-username").value;
             const password = document.getElementById("login-password").value;
 
-            if (login(username, password)) {
+            const success = await login(username, password);
+            if (success) {
                 showToast("Login berhasil! Selamat datang, " + currentUser.nama);
                 showMainApp();
             } else {
