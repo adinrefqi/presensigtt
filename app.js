@@ -1,14 +1,67 @@
 // App State & Data Management GTT SMP THHK
+// With Supabase Integration
+
+// --- SUPABASE INITIALIZATION ---
+let supabase = null;
+
+async function initSupabase() {
+    try {
+        // Check if Supabase SDK is loaded
+        if (typeof window.supabase !== 'undefined') {
+            // Get config from supabase.js
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('✅ Supabase Client initialized');
+
+            // Listen for auth state changes
+            supabase.auth.onAuthStateChange((event, session) => {
+                if (event === 'SIGNED_IN' && session) {
+                    handleSupabaseLogin(session.user);
+                } else if (event === 'SIGNED_OUT') {
+                    currentUser = null;
+                    localStorage.removeItem("gtt_current_user");
+                    showLoginScreen();
+                }
+            });
+
+            // Check if already logged in
+            const session = await supabase.auth.getSession();
+            if (session?.session) {
+                handleSupabaseLogin(session.session.user);
+                return true;
+            }
+        }
+    } catch (error) {
+        console.log('⚠️ Supabase not available, using local auth:', error.message);
+    }
+    return false;
+}
+
+// Handle Supabase login
+function handleSupabaseLogin(user) {
+    // Extract user data from Supabase metadata
+    currentUser = {
+        id: user.id,
+        email: user.email,
+        nama: user.user_metadata?.nama || user.email,
+        role: user.user_metadata?.role || 'guru',
+        guruId: user.user_metadata?.guruId || null
+    };
+    localStorage.setItem("gtt_current_user", JSON.stringify(currentUser));
+    showMainApp();
+}
 
 // --- USER AUTHENTICATION SYSTEM ---
 // Default users: Admin (Tata Usaha) and Teachers
 const DEFAULT_USERS = [
     { id: "U001", username: "admin", password: "admin123", nama: "Administrator", role: "admin" },
-    { id: "U002", username: "guru001", password: "guru123", nama: "Budi Santoso, S.Pd.", role: "guru", guruId: "G001" },
-    { id: "U003", username: "guru002", password: "guru123", nama: "Siti Aminah, S.Pd.", role: "guru", guruId: "G002" },
-    { id: "U004", username: "guru003", password: "guru123", nama: "Hendra Wijaya, M.Pd.", role: "guru", guruId: "G003" },
-    { id: "U005", username: "guru004", password: "guru123", nama: "Clara Angelica, S.S.", role: "guru", guruId: "G004" },
-    { id: "U006", username: "guru005", password: "guru123", nama: "Ahmad Fauzi, S.Ag.", role: "guru", guruId: "G005" }
+    { id: "U001b", username: "elsa", password: "elsa123", nama: "Elsa Angreani, S.T.", role: "admin" },
+    { id: "U002", username: "guru001", password: "guru123", nama: "Brigita Ajeng DWIANDARI, S.Pd.", role: "guru", guruId: "G001" },
+    { id: "U003", username: "guru002", password: "guru123", nama: "Fransiska Virgiana M, S.Pd.", role: "guru", guruId: "G002" },
+    { id: "U004", username: "guru003", password: "guru123", nama: "Ismadi, S.Pd.", role: "guru", guruId: "G003" },
+    { id: "U005", username: "guru004", password: "guru123", nama: "WS. Inggried Budiarti, S.Pd.", role: "guru", guruId: "G004" },
+    { id: "U006", username: "guru005", password: "guru123", nama: "Atmo Kusumo, S.Pd.", role: "guru", guruId: "G005" },
+    { id: "U007", username: "guru006", password: "guru123", nama: "Yunita Mentari Putri, S.Sn.", role: "guru", guruId: "G006" },
+    { id: "U008", username: "guru007", password: "guru123", nama: "Anom Kudho Winanto, S.Sn.", role: "guru", guruId: "G007" }
 ];
 
 // Load users from storage or use defaults
@@ -32,8 +85,22 @@ function getCurrentGuruId() {
     return currentUser && currentUser.guruId ? currentUser.guruId : null;
 }
 
-// Login function
-function login(username, password) {
+// Login function - supports both local and Supabase auth
+async function login(username, password) {
+    // Try Supabase auth first
+    if (supabase) {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: username + '@thhk.sch.id', // Convert username to email format
+            password: password
+        });
+
+        if (!error && data.user) {
+            handleSupabaseLogin(data.user);
+            return true;
+        }
+    }
+
+    // Fallback to local auth
     const user = usersList.find(u => u.username === username && u.password === password);
     if (user) {
         currentUser = user;
@@ -44,9 +111,15 @@ function login(username, password) {
 }
 
 // Logout function
-function logout() {
+async function logout() {
     currentUser = null;
     localStorage.removeItem("gtt_current_user");
+
+    // Try Supabase logout
+    if (supabase) {
+        await supabase.auth.signOut();
+    }
+
     showLoginScreen();
 }
 
@@ -92,11 +165,13 @@ function updateUserInterface() {
 
 // --- INITIALIZE STORAGE OR LOAD DEFAULT MOCK DATA ---
 const DEFAULT_GURU = [
-    { id: "G001", nuptk: "198402122009032001", nama: "Budi Santoso, S.Pd.", mapel: "Matematika", honor: 50000, wa: "08123456789", status: "Aktif" },
-    { id: "G002", nuptk: "198905242015042003", nama: "Siti Aminah, S.Pd.", mapel: "Bahasa Inggris", honor: 45000, wa: "08234567890", status: "Aktif" },
-    { id: "G003", nuptk: "197811122005011002", nama: "Hendra Wijaya, M.Pd.", mapel: "Fisika", honor: 55000, wa: "08345678901", status: "Aktif" },
-    { id: "G004", nuptk: "199208082020102005", nama: "Clara Angelica, S.S.", mapel: "Bahasa Mandarin", honor: 60000, wa: "08456789012", status: "Aktif" },
-    { id: "G005", nuptk: "198501022010031004", nama: "Ahmad Fauzi, S.Ag.", mapel: "Pendidikan Agama", honor: 40000, wa: "08567890123", status: "Aktif" }
+    { id: "G001", nuptk: "198402122009032001", nama: "Brigita Ajeng DWIANDARI, S.Pd.", mapel: "Matematika", honor: 50000, wa: "08123456789", status: "Aktif" },
+    { id: "G002", nuptk: "198905242015042003", nama: "Fransiska Virgiana M, S.Pd.", mapel: "Bahasa Inggris", honor: 45000, wa: "08234567890", status: "Aktif" },
+    { id: "G003", nuptk: "197811122005011002", nama: "Ismadi, S.Pd.", mapel: "Fisika", honor: 55000, wa: "08345678901", status: "Aktif" },
+    { id: "G004", nuptk: "199208082020102005", nama: "WS. Inggried Budiarti, S.Pd.", mapel: "Bahasa Mandarin", honor: 60000, wa: "08456789012", status: "Aktif" },
+    { id: "G005", nuptk: "198501022010031004", nama: "Atmo Kusumo, S.Pd.", mapel: "Pendidikan Agama", honor: 40000, wa: "08567890123", status: "Aktif" },
+    { id: "G006", nuptk: "199105152011012006", nama: "Yunita Mentari Putri, S.Sn.", mapel: "Seni Budaya", honor: 55000, wa: "08623456789", status: "Aktif" },
+    { id: "G007", nuptk: "198803202009022007", nama: "Anom Kudho Winanto, S.Sn.", mapel: "Prakarya", honor: 45000, wa: "08734567890", status: "Aktif" }
 ];
 
 const DEFAULT_JADWAL = [
