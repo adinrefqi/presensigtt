@@ -1535,28 +1535,6 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// Mobile Menu Toggle
-function initMobileMenu() {
-    const menuToggle = document.getElementById('menu-toggle');
-    const sidebar = document.querySelector('aside');
-
-    if (menuToggle) {
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('mobile-open');
-            menuToggle.classList.toggle('active');
-        });
-
-        // Close sidebar when clicking outside
-        document.addEventListener('click', (e) => {
-            if (sidebar.classList.contains('mobile-open') &&
-                !sidebar.contains(e.target) &&
-                !menuToggle.contains(e.target)) {
-                sidebar.classList.remove('mobile-open');
-                menuToggle.classList.remove('active');
-            }
-        });
-    }
-}
 
 // Handle back button for mobile
 window.addEventListener('popstate', (e) => {

@@ -11,13 +11,13 @@
 const SUPABASE_URL = 'https://aphmiysoebhkhnsmrprv.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwaG1peXNvZWJoa2huc21ycHJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMwMDU2NjcsImV4cCI6MjA5ODU4MTY2N30.ZPl9DH6vfj_tgSDcYlUCZb9s9AXBRSygjfDEJ_zTtCY';
 
-// Supabase client instance
-let supabase = null;
+// Supabase client instance (renamed to supabaseClient to prevent redeclaration SyntaxError with SDK global variable)
+let supabaseClient = null;
 
 // Initialize Supabase client
 function initSupabase() {
-    if (typeof window.supabase !== 'undefined') {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log('✅ Supabase Client initialized');
         return true;
     }
@@ -130,9 +130,9 @@ function loadSupabaseSDK() {
 
 // Fetch semua guru
 async function fetchGuru() {
-    if (!supabase) return null;
+    if (!supabaseClient) return null;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('guru')
         .select('*')
         .order('nama');
@@ -146,9 +146,9 @@ async function fetchGuru() {
 
 // Fetch guru by ID
 async function fetchGuruById(id) {
-    if (!supabase) return null;
+    if (!supabaseClient) return null;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('guru')
         .select('*')
         .eq('id', id)
@@ -163,9 +163,9 @@ async function fetchGuruById(id) {
 
 // Insert guru baru
 async function insertGuru(guruData) {
-    if (!supabase) return { error: 'Supabase not initialized' };
+    if (!supabaseClient) return { error: 'Supabase not initialized' };
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('guru')
         .insert([guruData])
         .select()
@@ -176,9 +176,9 @@ async function insertGuru(guruData) {
 
 // Update guru
 async function updateGuru(id, updates) {
-    if (!supabase) return { error: 'Supabase not initialized' };
+    if (!supabaseClient) return { error: 'Supabase not initialized' };
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('guru')
         .update({ ...updates, updated_at: new Date().toISOString() })
         .eq('id', id)
@@ -190,9 +190,9 @@ async function updateGuru(id, updates) {
 
 // Delete guru
 async function deleteGuru(id) {
-    if (!supabase) return { error: 'Supabase not initialized' };
+    if (!supabaseClient) return { error: 'Supabase not initialized' };
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('guru')
         .delete()
         .eq('id', id);
@@ -202,9 +202,9 @@ async function deleteGuru(id) {
 
 // Fetch semua jadwal
 async function fetchJadwal() {
-    if (!supabase) return null;
+    if (!supabaseClient) return null;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('jadwal')
         .select('*')
         .order('hari');
@@ -218,9 +218,9 @@ async function fetchJadwal() {
 
 // Insert jadwal baru
 async function insertJadwal(jadwalData) {
-    if (!supabase) return { error: 'Supabase not initialized' };
+    if (!supabaseClient) return { error: 'Supabase not initialized' };
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('jadwal')
         .insert([jadwalData])
         .select()
@@ -231,9 +231,9 @@ async function insertJadwal(jadwalData) {
 
 // Delete jadwal
 async function deleteJadwalById(id) {
-    if (!supabase) return { error: 'Supabase not initialized' };
+    if (!supabaseClient) return { error: 'Supabase not initialized' };
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('jadwal')
         .delete()
         .eq('id', id);
@@ -243,9 +243,9 @@ async function deleteJadwalById(id) {
 
 // Fetch presensi dengan filter
 async function fetchPresensi(filters = {}) {
-    if (!supabase) return null;
+    if (!supabaseClient) return null;
 
-    let query = supabase
+    let query = supabaseClient
         .from('presensi')
         .select('*')
         .order('tanggal', { ascending: false });
@@ -273,9 +273,9 @@ async function fetchPresensi(filters = {}) {
 
 // Insert presensi
 async function insertPresensi(presensiData) {
-    if (!supabase) return { error: 'Supabase not initialized' };
+    if (!supabaseClient) return { error: 'Supabase not initialized' };
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from('presensi')
         .insert([presensiData])
         .select()
@@ -286,9 +286,9 @@ async function insertPresensi(presensiData) {
 
 // Delete presensi
 async function deletePresensiById(id) {
-    if (!supabase) return { error: 'Supabase not initialized' };
+    if (!supabaseClient) return { error: 'Supabase not initialized' };
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from('presensi')
         .delete()
         .eq('id', id);
@@ -302,9 +302,9 @@ async function deletePresensiById(id) {
 
 // Sign up new user
 async function supabaseSignUp(email, password, userData) {
-    if (!supabase) return { error: 'Supabase not initialized' };
+    if (!supabaseClient) return { error: 'Supabase not initialized' };
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await supabaseClient.auth.signUp({
         email: email,
         password: password,
         options: {
@@ -317,9 +317,9 @@ async function supabaseSignUp(email, password, userData) {
 
 // Sign in user
 async function supabaseSignIn(email, password) {
-    if (!supabase) return { error: 'Supabase not initialized' };
+    if (!supabaseClient) return { error: 'Supabase not initialized' };
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
         email: email,
         password: password
     });
@@ -329,25 +329,25 @@ async function supabaseSignIn(email, password) {
 
 // Sign out user
 async function supabaseSignOut() {
-    if (!supabase) return { error: 'Supabase not initialized' };
+    if (!supabaseClient) return { error: 'Supabase not initialized' };
 
-    const { error } = await supabase.auth.signOut();
+    const { error } = await supabaseClient.auth.signOut();
     return { error };
 }
 
 // Get current session
 async function getSupabaseSession() {
-    if (!supabase) return null;
+    if (!supabaseClient) return null;
 
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await supabaseClient.auth.getSession();
     return session;
 }
 
 // Listen to auth state changes
 function onAuthStateChange(callback) {
-    if (!supabase) return null;
+    if (!supabaseClient) return null;
 
-    return supabase.auth.onAuthStateChange((event, session) => {
+    return supabaseClient.auth.onAuthStateChange((event, session) => {
         callback(event, session);
     });
 }
@@ -358,13 +358,13 @@ function onAuthStateChange(callback) {
 
 // Sync local data to Supabase
 async function syncLocalToSupabase() {
-    if (!supabase) return;
+    if (!supabaseClient) return;
 
     try {
         // Sync guru
         const localGuru = JSON.parse(localStorage.getItem("gtt_guru")) || [];
         for (const guru of localGuru) {
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('guru')
                 .upsert(guru, { onConflict: 'nuptk' });
             if (error) console.error('Error syncing guru:', guru.nama, error);
@@ -373,7 +373,7 @@ async function syncLocalToSupabase() {
         // Sync jadwal
         const localJadwal = JSON.parse(localStorage.getItem("gtt_jadwal")) || [];
         for (const jadwal of localJadwal) {
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('jadwal')
                 .upsert(jadwal);
             if (error) console.error('Error syncing jadwal:', error);
@@ -382,7 +382,7 @@ async function syncLocalToSupabase() {
         // Sync presensi
         const localPresensi = JSON.parse(localStorage.getItem("gtt_presensi")) || [];
         for (const presensi of localPresensi) {
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('presensi')
                 .upsert(presensi);
             if (error) console.error('Error syncing presensi:', error);
@@ -399,7 +399,7 @@ async function syncLocalToSupabase() {
 
 // Load data from Supabase to local storage
 async function loadFromSupabase() {
-    if (!supabase) return false;
+    if (!supabaseClient) return false;
 
     try {
         const [guruData, jadwalData, presensiData] = await Promise.all([

@@ -1,11 +1,13 @@
 // Service Worker for Presensi GTT SMP THHK PWA
 
-const CACHE_NAME = 'presensi-gtt-v1';
+const CACHE_NAME = 'presensi-gtt-v2';
 const STATIC_ASSETS = [
     '/',
     '/index.html',
     '/styles.css',
+    '/styles-mobile.css',
     '/app.js',
+    '/supabase.js',
     '/manifest.json',
     'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap',
     'https://unpkg.com/lucide@latest',
