@@ -1578,6 +1578,39 @@ document.addEventListener('DOMContentLoaded', () => {
     initMobileMenu();
 });
 
+// --- MOBILE MENU TOGGLE ---
+function initMobileMenu() {
+    const menuToggle = document.getElementById('menu-toggle');
+    const sidebar = document.querySelector('aside');
+
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('mobile-open');
+            menuToggle.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking on menu item (mobile)
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('mobile-open');
+                    menuToggle.classList.remove('active');
+                }
+            });
+        });
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', (e) => {
+            if (sidebar.classList.contains('mobile-open') &&
+                !sidebar.contains(e.target) &&
+                !menuToggle.contains(e.target)) {
+                sidebar.classList.remove('mobile-open');
+                menuToggle.classList.remove('active');
+            }
+        });
+    }
+}
+
 // --- INITIAL LOAD INVOCATION ---
 window.onload = () => {
     lucide.createIcons();
