@@ -1560,19 +1560,32 @@ document.addEventListener('DOMContentLoaded', () => {
 function initMobileMenu() {
     const menuToggle = document.getElementById('menu-toggle');
     const sidebar = document.querySelector('aside');
+    const overlay = document.getElementById('sidebar-overlay');
 
     if (menuToggle && sidebar) {
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('mobile-open');
-            menuToggle.classList.toggle('active');
-        });
+        const toggleMenu = () => {
+            const isOpen = sidebar.classList.toggle('mobile-open');
+            menuToggle.classList.toggle('active', isOpen);
+            if (overlay) overlay.classList.toggle('active', isOpen);
+        };
+
+        const closeMenu = () => {
+            sidebar.classList.remove('mobile-open');
+            menuToggle.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+        };
+
+        menuToggle.addEventListener('click', toggleMenu);
+
+        if (overlay) {
+            overlay.addEventListener('click', closeMenu);
+        }
 
         // Close sidebar when clicking on menu item (mobile)
         document.querySelectorAll('.menu-item').forEach(item => {
             item.addEventListener('click', () => {
                 if (window.innerWidth <= 768) {
-                    sidebar.classList.remove('mobile-open');
-                    menuToggle.classList.remove('active');
+                    closeMenu();
                 }
             });
         });
@@ -1581,9 +1594,9 @@ function initMobileMenu() {
         document.addEventListener('click', (e) => {
             if (sidebar.classList.contains('mobile-open') &&
                 !sidebar.contains(e.target) &&
-                !menuToggle.contains(e.target)) {
-                sidebar.classList.remove('mobile-open');
-                menuToggle.classList.remove('active');
+                !menuToggle.contains(e.target) &&
+                (!overlay || !overlay.contains(e.target))) {
+                closeMenu();
             }
         });
     }

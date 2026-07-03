@@ -40,6 +40,10 @@
         display: block;
     }
 
+    .app-container {
+        margin-left: 0 !important;
+    }
+
     /* Stats Grid Mobile */
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -89,13 +93,13 @@
         -webkit-overflow-scrolling: touch;
     }
 
-    .data-table {
+    .table-container table {
         font-size: 0.8rem;
         min-width: 600px;
     }
 
-    .data-table th,
-    .data-table td {
+    .table-container th,
+    .table-container td {
         padding: 10px 8px;
     }
 
@@ -104,6 +108,7 @@
     input[type="text"],
     input[type="number"],
     input[type="date"],
+    input[type="time"],
     input[type="password"],
     textarea {
         font-size: 16px;
