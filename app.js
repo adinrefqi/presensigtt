@@ -1559,7 +1559,10 @@ function renderDashboardChart() {
 }
 
 // --- LOGIN HANDLING ---
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    // Initialize Supabase
+    await initSupabase();
+
     // Check if user is already logged in
     if (currentUser) {
         showMainApp();
@@ -1575,8 +1578,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const username = document.getElementById("login-username").value;
             const password = document.getElementById("login-password").value;
 
+            console.log('Attempting login for:', username);
             const success = await login(username, password);
-            if (success) {
+            console.log('Login result:', success, 'currentUser:', currentUser);
+
+            if (success && currentUser) {
                 showToast("Login berhasil! Selamat datang, " + currentUser.nama);
                 showMainApp();
             } else {
