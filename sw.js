@@ -4,10 +4,10 @@ const CACHE_NAME = 'presensi-gtt-v3';
 const STATIC_ASSETS = [
     '/',
     '/index.html',
-    '/styles.css',
-    '/styles-mobile.css',
-    '/app.js',
-    '/supabase.js',
+    '/styles.css?v=3',
+    '/styles-mobile.css?v=3',
+    '/app.js?v=3',
+    '/supabase.js?v=3',
     '/manifest.json',
     'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap',
     'https://unpkg.com/lucide@latest',
@@ -50,7 +50,7 @@ self.addEventListener('fetch', (event) => {
     }
 
     event.respondWith(
-        caches.match(event.request)
+        caches.match(event.request, { ignoreSearch: true })
             .then((cachedResponse) => {
                 // Return cached response if found
                 if (cachedResponse) {
@@ -85,7 +85,7 @@ self.addEventListener('fetch', (event) => {
                     .catch(() => {
                         // Offline fallback - return cached index.html for navigation
                         if (event.request.mode === 'navigate') {
-                            return caches.match('/index.html');
+                            return caches.match('/index.html', { ignoreSearch: true });
                         }
                         return new Response('Offline', { status: 503 });
                     });

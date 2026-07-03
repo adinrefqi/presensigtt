@@ -89,6 +89,7 @@
 
     /* Tables Mobile */
     .table-container {
+        width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
@@ -196,8 +197,8 @@
     }
 }
 
-/* Small Mobile (< 480px) */
-@media (max-width: 480px) {
+/* Small Mobile (< 600px) */
+@media (max-width: 600px) {
     .app-container {
         padding: 12px;
         padding-bottom: 70px;
