@@ -1,53 +1,6 @@
 // App State & Data Management GTT SMP THHK
 // With Supabase Integration
 
-// --- SUPABASE INITIALIZATION ---
-async function initSupabase() {
-    try {
-        // Check if Supabase SDK is loaded
-        if (typeof window.supabase !== 'undefined') {
-            // Get config from supabase.js
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('✅ Supabase Client initialized');
-
-            // Listen for auth state changes
-            supabase.auth.onAuthStateChange((event, session) => {
-                if (event === 'SIGNED_IN' && session) {
-                    handleSupabaseLogin(session.user);
-                } else if (event === 'SIGNED_OUT') {
-                    currentUser = null;
-                    localStorage.removeItem("gtt_current_user");
-                    showLoginScreen();
-                }
-            });
-
-            // Check if already logged in
-            const session = await supabase.auth.getSession();
-            if (session?.session) {
-                handleSupabaseLogin(session.session.user);
-                return true;
-            }
-        }
-    } catch (error) {
-        console.log('⚠️ Supabase not available, using local auth:', error.message);
-    }
-    return false;
-}
-
-// Handle Supabase login
-function handleSupabaseLogin(user) {
-    // Extract user data from Supabase metadata
-    currentUser = {
-        id: user.id,
-        email: user.email,
-        nama: user.user_metadata?.nama || user.email,
-        role: user.user_metadata?.role || 'guru',
-        guruId: user.user_metadata?.guruId || null
-    };
-    localStorage.setItem("gtt_current_user", JSON.stringify(currentUser));
-    showMainApp();
-}
-
 // --- USER AUTHENTICATION SYSTEM ---
 // Default users: Admin (Tata Usaha) and Teachers
 const DEFAULT_USERS = [
@@ -83,22 +36,8 @@ function getCurrentGuruId() {
     return currentUser && currentUser.guruId ? currentUser.guruId : null;
 }
 
-// Login function - supports both local and Supabase auth
-async function login(username, password) {
-    // Try Supabase auth first
-    if (supabase) {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: username + '@thhk.sch.id', // Convert username to email format
-            password: password
-        });
-
-        if (!error && data.user) {
-            handleSupabaseLogin(data.user);
-            return true;
-        }
-    }
-
-    // Fallback to local auth
+// Login function - local auth only for now
+function login(username, password) {
     const user = usersList.find(u => u.username === username && u.password === password);
     if (user) {
         currentUser = user;
@@ -109,15 +48,9 @@ async function login(username, password) {
 }
 
 // Logout function
-async function logout() {
+function logout() {
     currentUser = null;
     localStorage.removeItem("gtt_current_user");
-
-    // Try Supabase logout
-    if (supabase) {
-        await supabase.auth.signOut();
-    }
-
     showLoginScreen();
 }
 
@@ -1557,10 +1490,7 @@ function renderDashboardChart() {
 }
 
 // --- LOGIN HANDLING ---
-document.addEventListener("DOMContentLoaded", async () => {
-    // Initialize Supabase
-    await initSupabase();
-
+document.addEventListener("DOMContentLoaded", () => {
     // Check if user is already logged in
     if (currentUser) {
         showMainApp();
@@ -1571,16 +1501,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Login form submit
     const loginForm = document.getElementById("login-form");
     if (loginForm) {
-        loginForm.addEventListener("submit", async (e) => {
+        loginForm.addEventListener("submit", (e) => {
             e.preventDefault();
             const username = document.getElementById("login-username").value;
             const password = document.getElementById("login-password").value;
 
-            console.log('Attempting login for:', username);
-            const success = await login(username, password);
-            console.log('Login result:', success, 'currentUser:', currentUser);
-
-            if (success && currentUser) {
+            if (login(username, password)) {
                 showToast("Login berhasil! Selamat datang, " + currentUser.nama);
                 showMainApp();
             } else {
