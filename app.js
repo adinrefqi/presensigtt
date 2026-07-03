@@ -2,8 +2,6 @@
 // With Supabase Integration
 
 // --- SUPABASE INITIALIZATION ---
-let supabase = null;
-
 async function initSupabase() {
     try {
         // Check if Supabase SDK is loaded
